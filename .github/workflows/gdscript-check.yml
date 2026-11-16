@@ -1,0 +1,108 @@
+name: GDScript Check
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check-gdscript:
+    name: Check GDScript
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    env:
+      GODOT_VERSION: 4.7.2
+      GODOT_RELEASE: stable
+      GDTOOLKIT_VERSION: 4.5.0
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install gdtoolkit
+        run: python -m pip install "gdtoolkit==${GDTOOLKIT_VERSION}"
+
+      - name: Lint GDScript
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          scripts=()
+          while IFS= read -r -d '' script; do
+            scripts+=("${script}")
+          done < <(
+            find . \
+              -path './.git' -prune -o \
+              -path './.godot' -prune -o \
+              -path './addons' -prune -o \
+              -type f -name '*.gd' -print0
+          )
+
+          if (( ${#scripts[@]} == 0 )); then
+            echo 'No GDScript files to lint.'
+          else
+            gdlint "${scripts[@]}"
+          fi
+
+      - name: Install Godot
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          godot_zip="Godot_v${GODOT_VERSION}-${GODOT_RELEASE}_linux.x86_64.zip"
+          godot_bin="Godot_v${GODOT_VERSION}-${GODOT_RELEASE}_linux.x86_64"
+          godot_url="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-${GODOT_RELEASE}/${godot_zip}"
+
+          curl --fail --location --retry 3 --output godot.zip "${godot_url}"
+          unzip -q godot.zip -d godot
+          sudo mv "godot/${godot_bin}" /usr/local/bin/godot
+          sudo chmod +x /usr/local/bin/godot
+
+          godot --version
+
+      - name: Build Godot class cache
+        run: godot --headless --path . --import --quit
+
+      - name: Verify images and Japanese font
+        run: godot --headless --path . --script tests/web_assets_smoke.gd
+
+      - name: Check GDScript syntax
+        shell: bash
+        run: |
+          set -uo pipefail
+
+          found=0
+          status=0
+
+          while IFS= read -r -d '' script; do
+            found=1
+            echo "::group::${script}"
+            godot --headless --path . --check-only --script "${script}" || status=1
+            echo '::endgroup::'
+          done < <(
+            find . \
+              -path './.git' -prune -o \
+              -path './.godot' -prune -o \
+              -path './addons' -prune -o \
+              -type f -name '*.gd' -print0
+          )
+
+          if (( found == 0 )); then
+            echo 'No GDScript files found.'
+            exit 0
+          fi
+
+          exit "${status}"
