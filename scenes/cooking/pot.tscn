@@ -1,0 +1,43 @@
+[gd_scene format=3]
+
+[sub_resource type="StandardMaterial3D" id="Mat_pot"]
+albedo_color = Color(0.72, 0.74, 0.78, 1)
+metallic = 0.7
+roughness = 0.3
+
+[sub_resource type="CylinderMesh" id="Mesh_body"]
+material = SubResource("Mat_pot")
+top_radius = 0.15
+bottom_radius = 0.14
+height = 0.18
+
+[sub_resource type="StandardMaterial3D" id="Mat_soup"]
+albedo_color = Color(0.98, 0.84, 0.35, 1)
+
+[sub_resource type="CylinderMesh" id="Mesh_soup"]
+material = SubResource("Mat_soup")
+top_radius = 0.135
+bottom_radius = 0.135
+height = 0.01
+
+[sub_resource type="BoxMesh" id="Mesh_handle"]
+material = SubResource("Mat_pot")
+size = Vector3(0.12, 0.02, 0.03)
+
+[node name="Pot" type="Node3D"]
+
+[node name="Body" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.09, 0)
+mesh = SubResource("Mesh_body")
+
+[node name="Soup" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.181, 0)
+mesh = SubResource("Mesh_soup")
+
+[node name="HandleLeft" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2, 0.15, 0)
+mesh = SubResource("Mesh_handle")
+
+[node name="HandleRight" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2, 0.15, 0)
+mesh = SubResource("Mesh_handle")

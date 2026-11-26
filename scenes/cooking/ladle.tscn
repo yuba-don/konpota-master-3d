@@ -1,0 +1,28 @@
+[gd_scene format=3]
+
+[sub_resource type="StandardMaterial3D" id="Mat_ladle"]
+albedo_color = Color(0.82, 0.83, 0.86, 1)
+metallic = 0.8
+roughness = 0.25
+
+[sub_resource type="CylinderMesh" id="Mesh_handle"]
+material = SubResource("Mat_ladle")
+top_radius = 0.008
+bottom_radius = 0.008
+height = 0.3
+
+[sub_resource type="SphereMesh" id="Mesh_cup"]
+material = SubResource("Mat_ladle")
+radius = 0.04
+height = 0.04
+is_hemisphere = true
+
+[node name="Ladle" type="Node3D"]
+
+[node name="Handle" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
+mesh = SubResource("Mesh_handle")
+
+[node name="Cup" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -1, 0, 0, 0, -1, 0, 0.04, 0)
+mesh = SubResource("Mesh_cup")
