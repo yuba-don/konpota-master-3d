@@ -57,21 +57,11 @@ jobs:
             gdlint "${scripts[@]}"
           fi
 
-      - name: Install Godot
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          godot_zip="Godot_v${GODOT_VERSION}-${GODOT_RELEASE}_linux.x86_64.zip"
-          godot_bin="Godot_v${GODOT_VERSION}-${GODOT_RELEASE}_linux.x86_64"
-          godot_url="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-${GODOT_RELEASE}/${godot_zip}"
-
-          curl --fail --location --retry 3 --output godot.zip "${godot_url}"
-          unzip -q godot.zip -d godot
-          sudo mv "godot/${godot_bin}" /usr/local/bin/godot
-          sudo chmod +x /usr/local/bin/godot
-
-          godot --version
+      - name: Set up Godot
+        uses: ./.github/actions/setup-godot
+        with:
+          version: ${{ env.GODOT_VERSION }}
+          release: ${{ env.GODOT_RELEASE }}
 
       - name: Build Godot class cache
         run: godot --headless --path . --import --quit
