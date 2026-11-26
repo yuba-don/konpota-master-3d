@@ -1,0 +1,93 @@
+[gd_scene format=3 uid="uid://dgbv2qegi7c64"]
+
+[ext_resource type="PackedScene" path="res://scenes/cooking/stove.tscn" id="1_stove"]
+[ext_resource type="PackedScene" path="res://scenes/cooking/pot.tscn" id="2_pot"]
+[ext_resource type="PackedScene" path="res://scenes/cooking/serving_bowl.tscn" id="3_bowl"]
+[ext_resource type="PackedScene" path="res://scenes/cooking/ladle.tscn" id="4_ladle"]
+[ext_resource type="PackedScene" path="res://scenes/cooking/serving_counter.tscn" id="5_counter"]
+
+[sub_resource type="Environment" id="Env"]
+background_mode = 1
+background_color = Color(0.93, 0.9, 0.84, 1)
+ambient_light_source = 2
+ambient_light_color = Color(1, 0.97, 0.92, 1)
+ambient_light_energy = 0.12
+tonemap_mode = 2
+
+[sub_resource type="StandardMaterial3D" id="Mat_floor"]
+albedo_color = Color(0.5, 0.42, 0.36, 1)
+roughness = 0.9
+
+[sub_resource type="PlaneMesh" id="Mesh_floor"]
+material = SubResource("Mat_floor")
+size = Vector2(8, 8)
+
+[sub_resource type="StandardMaterial3D" id="Mat_wall"]
+albedo_color = Color(0.78, 0.82, 0.8, 1)
+
+[sub_resource type="BoxMesh" id="Mesh_wall"]
+material = SubResource("Mat_wall")
+size = Vector3(8, 3, 0.1)
+
+[sub_resource type="StandardMaterial3D" id="Mat_work"]
+albedo_color = Color(0.62, 0.66, 0.68, 1)
+roughness = 0.6
+
+[sub_resource type="BoxMesh" id="Mesh_work"]
+material = SubResource("Mat_work")
+size = Vector3(2.4, 0.9, 0.9)
+
+[node name="Kitchen" type="Node3D" unique_id=406458411]
+
+[node name="Environment" type="Node3D" parent="." unique_id=1251290623]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="Environment" unique_id=345687758]
+environment = SubResource("Env")
+
+[node name="Sun" type="DirectionalLight3D" parent="Environment" unique_id=686034782]
+transform = Transform3D(0.866025, 0.383022, -0.321394, 0, 0.642788, 0.766044, 0.5, -0.663414, 0.55667, 0, 3, 0)
+light_energy = 0.5
+shadow_enabled = true
+shadow_blur = 2.0
+
+[node name="Floor" type="MeshInstance3D" parent="Environment" unique_id=1574482393]
+mesh = SubResource("Mesh_floor")
+
+[node name="BackWall" type="MeshInstance3D" parent="Environment" unique_id=1890068854]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -3.5)
+mesh = SubResource("Mesh_wall")
+
+[node name="WorkCounter" type="MeshInstance3D" parent="Environment" unique_id=1295844688]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, -0.75)
+mesh = SubResource("Mesh_work")
+
+[node name="CameraRig" type="Node3D" parent="." unique_id=1549059939]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0.2)
+
+[node name="Camera3D" type="Camera3D" parent="CameraRig" unique_id=20965735]
+transform = Transform3D(1, 0, 0, 0, 0.939693, 0.34202, 0, -0.34202, 0.939693, 0, 0, 0)
+current = true
+
+[node name="KitchenObjects" type="Node3D" parent="." unique_id=2007123377]
+
+[node name="Stove" parent="KitchenObjects" unique_id=1841581895 instance=ExtResource("1_stove")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.15, 0.9, -0.95)
+
+[node name="Pot" parent="KitchenObjects" unique_id=83640934 instance=ExtResource("2_pot")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.15, 1.02, -0.98)
+
+[node name="Ladle" parent="KitchenObjects" unique_id=26617353 instance=ExtResource("4_ladle")]
+transform = Transform3D(0.906308, 0.422618, 0, -0.422618, 0.906308, 0, 0, 0, 1, -0.2, 1.06, -0.98)
+
+[node name="ServingBowl" parent="KitchenObjects" unique_id=1069922884 instance=ExtResource("3_bowl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.26, 0.9, -0.92)
+
+[node name="ServingCounter" parent="KitchenObjects" unique_id=552645206 instance=ExtResource("5_counter")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2.2)
+
+[node name="Ingredients" type="Node3D" parent="." unique_id=608021821]
+
+[node name="Customers" type="Node3D" parent="." unique_id=469932]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2.7)
+
+[node name="UI" type="CanvasLayer" parent="." unique_id=1299967711]

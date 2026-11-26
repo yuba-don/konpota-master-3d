@@ -1,0 +1,26 @@
+[gd_scene format=3]
+
+[sub_resource type="StandardMaterial3D" id="Mat_counter"]
+albedo_color = Color(0.55, 0.36, 0.22, 1)
+roughness = 0.8
+
+[sub_resource type="BoxMesh" id="Mesh_counter"]
+material = SubResource("Mat_counter")
+size = Vector3(2.4, 1, 0.4)
+
+[sub_resource type="StandardMaterial3D" id="Mat_top"]
+albedo_color = Color(0.7, 0.66, 0.58, 1)
+
+[sub_resource type="BoxMesh" id="Mesh_top"]
+material = SubResource("Mat_top")
+size = Vector3(2.5, 0.04, 0.5)
+
+[node name="ServingCounter" type="Node3D"]
+
+[node name="Body" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+mesh = SubResource("Mesh_counter")
+
+[node name="Top" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.02, 0)
+mesh = SubResource("Mesh_top")
