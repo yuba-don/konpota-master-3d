@@ -1,0 +1,60 @@
+name: Set up Godot
+description: Install the Godot editor (and optionally export templates) with caching.
+
+inputs:
+  version:
+    description: Godot version, e.g. 4.7.2
+    required: true
+  release:
+    description: Release channel, e.g. stable
+    default: stable
+  export-templates:
+    description: Also install export templates
+    default: "false"
+
+runs:
+  using: composite
+  steps:
+    - name: Restore Godot cache
+      id: cache
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cache/godot-bin
+          ~/.local/share/godot/export_templates/${{ inputs.version }}.${{ inputs.release }}
+        key: godot-${{ runner.os }}-${{ inputs.version }}-${{ inputs.release }}-templates-${{ inputs.export-templates }}
+
+    - name: Download Godot
+      if: steps.cache.outputs.cache-hit != 'true'
+      shell: bash
+      env:
+        GODOT_VERSION: ${{ inputs.version }}
+        GODOT_RELEASE: ${{ inputs.release }}
+        WITH_TEMPLATES: ${{ inputs.export-templates }}
+      run: |
+        set -euo pipefail
+        base="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-${GODOT_RELEASE}"
+        name="Godot_v${GODOT_VERSION}-${GODOT_RELEASE}"
+        tmp="$(mktemp -d)"
+
+        curl --fail --location --retry 3 --output "${tmp}/godot.zip" "${base}/${name}_linux.x86_64.zip"
+        unzip -q "${tmp}/godot.zip" -d "${tmp}/godot"
+        mkdir -p ~/.cache/godot-bin
+        mv "${tmp}/godot/${name}_linux.x86_64" ~/.cache/godot-bin/godot
+        chmod +x ~/.cache/godot-bin/godot
+
+        if [[ "${WITH_TEMPLATES}" == "true" ]]; then
+          templates_dir="${HOME}/.local/share/godot/export_templates/${GODOT_VERSION}.${GODOT_RELEASE}"
+          curl --fail --location --retry 3 --output "${tmp}/templates.tpz" "${base}/${name}_export_templates.tpz"
+          mkdir -p "${templates_dir}"
+          # Web templates only: the full archive is large and the cache stays small.
+          unzip -q -j "${tmp}/templates.tpz" 'templates/web_*' 'templates/version.txt' -d "${templates_dir}"
+        fi
+
+        rm -rf "${tmp}"
+
+    - name: Add Godot to PATH
+      shell: bash
+      run: |
+        echo "${HOME}/.cache/godot-bin" >> "${GITHUB_PATH}"
+        "${HOME}/.cache/godot-bin/godot" --version
